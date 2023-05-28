@@ -56,11 +56,11 @@ export interface ProjectProps {
   plan: PlanProps;
   stripeId?: string;
   billingCycleStart?: number;
+  createdAt?: Date;
 
-  // TO DELETE
-  ownerUsageLimit?: number;
-  ownerExceededUsage?: boolean;
-
+  domains?: {
+    slug: string;
+  }[];
   users?: {
     role: string;
   }[];
@@ -75,10 +75,8 @@ export interface UserProps {
   id: string;
   name: string;
   email: string;
-
-  // TO DELETE
-  stripeId: string;
-  usageLimit: number;
+  image?: string;
+  createdAt: Date;
 
   joinedAt?: Date;
   projects?: { projectId: string }[];

@@ -187,7 +187,7 @@ function AddEditLinkModal({
       return {
         method: "PUT",
         url: `/api/links/${encodeURIComponent(props.key)}${
-          slug ? `?slug=${slug}&domain=${domain}` : ""
+          slug ? `?slug=${slug}&domain=${props.domain}` : ""
         }`,
       };
     } else {
@@ -312,28 +312,28 @@ function AddEditLinkModal({
                     { revalidate: true },
                   );
                   // for welcome page, redirect to links page after adding a link
-                  if (router.asPath === "/welcome") {
+                  if (router.pathname === "/app/welcome") {
                     router.push("/links").then(() => {
                       setShowAddEditLinkModal(false);
                     });
-                  } else {
-                    // copy shortlink to clipboard when adding a new link
-                    if (!props) {
-                      navigator.clipboard
-                        .writeText(
-                          linkConstructor({
-                            key: data.key,
-                            domain,
-                          }),
-                        )
-                        .then(() => {
-                          toast.success("Copied shortlink to clipboard!");
-                        });
-                    } else {
-                      toast.success("Successfully updated shortlink!");
-                    }
-                    setShowAddEditLinkModal(false);
                   }
+                  // copy shortlink to clipboard when adding a new link
+                  if (!props) {
+                    navigator.clipboard
+                      .writeText(
+                        linkConstructor({
+                          // remove leading and trailing slashes
+                          key: data.key.replace(/^\/|\/$/g, ""),
+                          domain,
+                        }),
+                      )
+                      .then(() => {
+                        toast.success("Copied shortlink to clipboard!");
+                      });
+                  } else {
+                    toast.success("Successfully updated shortlink!");
+                  }
+                  setShowAddEditLinkModal(false);
                 } else {
                   const error = await res.text();
                   if (error) {
@@ -590,8 +590,8 @@ function AddEditLinkButton({
       content={
         <TooltipContent
           title="Your project has exceeded its usage limit. We're still collecting data on your existing links, but you need to upgrade to add more links."
-          cta="Upgrade"
-          ctaLink={`/${slug}/settings/billing`}
+          cta="Upgrade to Pro"
+          href={`/${slug}/settings/billing`}
         />
       }
     >
@@ -639,14 +639,7 @@ export function useAddEditLinkModal({
         homepageDemo={homepageDemo}
       />
     );
-  }, [
-    showAddEditLinkModal,
-    setShowAddEditLinkModal,
-    props,
-    duplicateProps,
-    hideXButton,
-    homepageDemo,
-  ]);
+  }, [showAddEditLinkModal, setShowAddEditLinkModal]);
 
   const AddEditLinkButtonCallback = useCallback(() => {
     return (

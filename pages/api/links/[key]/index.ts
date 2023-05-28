@@ -13,7 +13,10 @@ export const config = {
 
 export default withLinksAuth(
   async (req, res, session, project, domain, link) => {
-    const { key: oldKey } = req.query as { key: string };
+    const { key: oldKey, domain: oldDomain } = req.query as {
+      key: string;
+      domain: string;
+    };
 
     // GET /api/links/:key – get a link
     if (req.method === "GET") {
@@ -38,16 +41,21 @@ export default withLinksAuth(
         if (domainBlacklisted) {
           return res.status(422).end("Invalid url.");
         }
+      } else if (key === "/") {
+        return res.status(422).end("Key cannot be '/'.");
       }
 
       const [response, invalidFavicon] = await Promise.allSettled([
         editLink(
           {
             ...req.body,
-            domain: domain || "dub.sh",
+            domain: req.body.domain || "dub.sh",
             userId: session.user.id,
           },
-          oldKey,
+          {
+            oldDomain: oldDomain || "dub.sh",
+            oldKey,
+          },
         ),
         ...(!project
           ? [fetch(`${GOOGLE_FAVICON_URL}${url}`).then((res) => !res.ok)]

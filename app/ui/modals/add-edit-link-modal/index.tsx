@@ -193,7 +193,7 @@ function AddEditLinkModal({
       return {
         method: "PUT",
         url: `/api/links/${encodeURIComponent(props.key)}${
-          slug ? `?slug=${slug}&domain=${domain}` : ""
+          slug ? `?slug=${slug}&domain=${props.domain}` : ""
         }`,
       };
     } else {
@@ -593,8 +593,8 @@ function AddEditLinkButton({
       content={
         <TooltipContent
           title="Your project has exceeded its usage limit. We're still collecting data on your existing links, but you need to upgrade to add more links."
-          cta="Upgrade"
-          ctaLink={`/${slug}/settings/billing`}
+          cta="Upgrade to Pro"
+          href={`/${slug}/settings/billing`}
         />
       }
     >
